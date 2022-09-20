@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pure HTML Demo</title>
+</head>
+<body>
+    <script src="vue.global.js"></script>
+
+    <div id="app">{{ message }}</div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    message: 'Hello Vue!'
+                }
+            },
+            methods: {
+                getCookie: function (name) {
+                    const cookie = document.cookie;
+                    const cookieList = cookie.split("; ")
+                    for (let i=0; i<cookieList.length; i++) {
+                        const item = cookieList[i].split("=")
+                        if (item[0] === name) {
+                            return item[1]
+                        }
+                    }
+                    return "";
+                }
+            },
+            mounted: function () {
+                const userCookie = this.getCookie("user")
+                if (userCookie === "") {
+                    window.location.href = "./login.html"
+                }
+            }
+        }).mount('#app')
+    </script>
+
+</body>
+</html>

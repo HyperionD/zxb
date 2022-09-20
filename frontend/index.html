@@ -3,11 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <title>Pure HTML Demo</title>
+    <style>
+        table {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: collapse;
+            border: 3px solid #000;
+        }
+
+        thead th:nth-child(1) {
+            width: 30%;
+        }
+
+        thead th:nth-child(2) {
+            width: 20%;
+        }
+
+        thead th:nth-child(3) {
+            width: 15%;
+        }
+
+        thead th:nth-child(4) {
+            width: 35%;
+        }
+
+        th, td {
+            padding: 20px;
+            border: 3px solid #000;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <script src="vue.global.js"></script>
 
-    <div id="app">{{ message }}</div>
+    <div id="app">
+        <button @click="showAddDialog = true">新增</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>账号</th>
+                    <th>姓名</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(user, index) in users">
+                    <td>{{ user.account }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>
+                        <button @click="deleteUser(user.id)">删除</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="dialog" v-show="showAddDialog">
+            <input placeholder="账号" />
+            <input placeholder="用户名" />
+            <input placeholder="密码" />
+            <button @click="addUser">添加用户</button>
+        </div>
+    </div>
 
     <script>
         const { createApp } = Vue
@@ -15,7 +72,9 @@
         createApp({
             data() {
                 return {
-                    message: 'Hello Vue!'
+                    message: 'Hello Vue!',
+                    users: [],
+                    showAddDialog: false,
                 }
             },
             methods: {
@@ -29,6 +88,30 @@
                         }
                     }
                     return "";
+                },
+                getAllUsers: function () {
+                    fetch("http://127.0.0.1:8080/users?" + new URLSearchParams({
+                        account: "",
+                        name: "",
+                    })).then((res) => {
+                        return res.json();
+                    }).then((res) => {
+                        console.log(res)
+                        this.users = res;
+                    })
+                },
+                deleteUser: function (id) {
+                    fetch("http://127.0.0.1:8080/users/" + id, {
+                        method: "DELETE"
+                    }).then((res) => {
+                        return res.json();
+                    }).then((res) => {
+                        console.log(res)
+                        this.getAllUsers()
+                    })
+                },
+                addUser: function () {
+                    this.showAddDialog = false
                 }
             },
             mounted: function () {
@@ -36,6 +119,7 @@
                 if (userCookie === "") {
                     window.location.href = "./login.html"
                 }
+                this.getAllUsers()
             }
         }).mount('#app')
     </script>

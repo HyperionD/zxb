@@ -1,6 +1,9 @@
 package org.example.user;
 
 import org.example.Resp;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.internal.NativeQueryImpl;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -134,7 +137,8 @@ public class UserController {
 
         System.out.println(sql);
 
-        Query q = em.createNativeQuery(sql);
+        NativeQueryImpl q = em.createNativeQuery(sql).unwrap(NativeQueryImpl.class);
+        q.setResultTransformer(Transformers.aliasToBean(User.class));
         users = q.getResultList();
 
         return users;
